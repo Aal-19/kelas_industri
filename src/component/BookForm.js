@@ -15,13 +15,14 @@ export default function BookForm() {
     });
 
     useEffect(() => {
-        if (isEdit) {
-            fetch(`/api/books/${params.id}`)
-                .then((res) => res.json())
-                .then((data) => setForm({ title: data.title, author: data.author }))
-                .catch(() => alert("Gagal mengambil data buku"));
-        }
-    }, [isEdit, params.id]);
+    if (isEdit && params?.id) {
+        fetch(`/api/books/${params.id}`)
+            .then((res) => res.json())
+            .then((data) => setForm({ title: data.title, author: data.author }))
+            .catch(() => alert("Gagal mengambil data buku"));
+    }
+}, [isEdit, params?.id]);
+
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });

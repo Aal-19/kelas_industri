@@ -4,7 +4,7 @@ import BookForm  from "../../component/BookForm";
 export default function BookAdd() {
     const router = useRouter();
     const Addbook = async (book) => {
-        const res = await fetch("http://localhost:3000/api/books", {
+        const res = await fetch("http://localhost:3002/api/books", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

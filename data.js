@@ -1,19 +1,19 @@
 let category = [
   {
-    "id": 1,
-    "name": "Ilmiah"
-  },
-  {
     "id": 2,
     "name": "Non-Fiksi"
   },
   {
-    "id": 3,
-    "name": "Komik"
-  },
-  {
     "id": 1746715166488,
     "name": "Brainrot"
+  },
+  {
+    "id": 1749809823227,
+    "name": "Sejarah"
+  },
+  {
+    "id": 1749810313423,
+    "name": "Komik"
   }
 ];
 let books = [

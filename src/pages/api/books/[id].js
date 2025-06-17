@@ -1,50 +1,42 @@
-import { category, books } from "../../../../data";
-import fs from "fs";
-import path from "path";
+const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5000";
 
-export default function handler(req, res) {
-  const { id } = req.query;
-  const bookId = parseInt(id, 10);
-  const bookIndex = books.findIndex((book) => book.id === bookId);
+export default async function handler(req, res) {
+  const {
+    method,
+    query: { id },
+  } = req;
 
-  if (req.method === "GET") {
-    if (bookIndex === -1) {
-      return res.status(404).json({ message: "Book not found" });
+  switch (method) {
+    case 'GET': {
+      const fetchRes = await fetch(`${BACKEND_URL}/books/${id}`);
+      const data = await fetchRes.json();
+      return res.status(fetchRes.status).json(data);
     }
-    res.status(200).json(books[bookIndex]);
-  } 
-  
-  else if (req.method === "PUT") {
-    if (bookIndex === -1) {
-      return res.status(404).json({ message: "Book not found" });
+    case 'PUT': {
+      const { title, author } = req.body;
+      const fetchRes = await fetch(`${BACKEND_URL}/books/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title, author }),
+      });
+      const data = await fetchRes.json();
+      return res.status(fetchRes.status).json(data);
     }
-
-    const { title, author } = req.body;
-    books[bookIndex] = { ...books[bookIndex], title, author };
-
-    const filePath = path.join(process.cwd(), "data.js");
-    const updatedData = `let category = ${JSON.stringify(category, null, 2)};\nlet books = ${JSON.stringify(books, null, 2)};\nmodule.exports = { category, books };`;
-    fs.writeFileSync(filePath, updatedData, "utf8");
-
-    res.status(200).json(books[bookIndex]);
-  } 
-  
-  else if (req.method === "DELETE") {
-    if (bookIndex === -1) {
-      return res.status(404).json({ message: "Book not found" });
+    case 'DELETE': {
+      const fetchRes = await fetch(`${BACKEND_URL}/books/${id}`, {
+        method: 'DELETE',
+      });
+      if (fetchRes.status === 204) {
+        return res.status(204).end();
+      }
+      const data = await fetchRes.json();
+      return res.status(fetchRes.status).json(data);
     }
-
-    books.splice(bookIndex, 1);
-
-    const filePath = path.join(process.cwd(), "data.js");
-    const updatedData = `let category = ${JSON.stringify(category, null, 2)};\nlet books = ${JSON.stringify(books, null, 2)};\nmodule.exports = { category, books };`;
-    fs.writeFileSync(filePath, updatedData, "utf8");
-
-    res.status(200).json({ message: "Book deleted successfully" });
-  } 
-  
-  else {
-    res.setHeader("Allow", ["GET", "PUT", "DELETE"]);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
+    default: {
+      res.setHeader('Allow', ['GET', 'PUT', 'DELETE']);
+      res.status(405).json({ message: `Method ${method} Not Allowed` });
+    }
   }
 }

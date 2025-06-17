@@ -1,23 +1,31 @@
-import fs from "fs";
-import path from "path";
-import { category, books } from "../../../../data";
+const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5000";
 
-export default function handler(req, res) {
-    if (req.method === "GET") {
-        res.status(200).json(books);
-    } else if (req.method === "POST") {
-        const { title, author } = req.body;
-        const newBook = {
-            id: Date.now(),
-            title,
-            author,
-        };
-        books.push(newBook);
+export default async function handler(req, res) {
+    const { method } = req;
 
-        const filePath = path.join(process.cwd(), "data.js");
-        const updatedData = `let category = ${JSON.stringify(category)};\nlet books = ${JSON.stringify(books)};\nmodule.exports = { category, books };`;
-        fs.writeFileSync(filePath, updatedData, "utf8");
-
-        res.status(201).json(newBook);
+    switch (method) {
+        case 'GET': {
+            const fetchRes = await fetch(`${BACKEND_URL}/books`);
+            const data = await fetchRes.json();
+            return res.status(fetchRes.status).json(data);
+        }
+        case 'POST': {
+            const { title, author } = req.body;
+            const fetchRes = await fetch(`${BACKEND_URL}/books`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ title, author }),
+            });
+            const data = await fetchRes.json();
+            return res.status(fetchRes.status).json(data);
+        }
+        default: {
+            res.setHeader('Allow', ['GET', 'POST']);
+            return res.status(405).json({
+                message: `Method ${method} Not Allowed`
+            });
+        }
     }
 }

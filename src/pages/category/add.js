@@ -6,7 +6,7 @@ export default function CategoryAdd() {
 
     // Fungsi untuk menangani submit form kategori
     const addCategory = async (category) => {
-        const res = await fetch("http://localhost:3000/api/category", {
+        const res = await fetch("http://localhost:3002/api/category", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

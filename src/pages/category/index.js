@@ -7,7 +7,7 @@ export default function CategoryList() {
     const [categories, setCategories] = useState([]);
 
     useEffect(() => {
-        fetch("http://localhost:3000/api/category")
+        fetch("http://localhost:3002/api/category")
             .then((res) => res.json())
             .then((data) => setCategories(data));
     }, []);
